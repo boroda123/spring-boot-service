@@ -1,0 +1,32 @@
+
+# Maven commands
+
+[System.Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Java\jdk-17")
+mvn clean package -DskipTests=true
+
+mvn dependency:tree
+mvn spring-boot:run
+
+# Docker commands
+docker images -a
+docker rmi <image_id>
+docker rmi $(docker images -a -q) # remove all images
+
+docker ps -a
+docker stop <container_id>
+docker stop $(docker ps -q) # stop all containers
+docker rm $(docker ps -a -q) # remove all containers
+
+docker system prune -a # clean ALL -  images, containers, volumes, and networks
+
+# Docker Compose commands
+docker-compose build
+docker-compose up
+docker-compose down
+
+# Kubernetes
+ kubectl version --client
+ minikube start # start a local cluster
+ kubectl cluster-info
+ kubectl create deployment my_app_name --image my_image_name
+ kubectl get deployments

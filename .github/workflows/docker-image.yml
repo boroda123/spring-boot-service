@@ -28,4 +28,4 @@ jobs:
         run: docker build . --file Dockerfile --tag docker-image-name:$(date -u +%Y-%m-%d-%H%M%S)
 
       - name: Build the Docker Compose image
-        run: docker-compose build --file docker-compose.yml --tag docker-compose-image-name:$(date -u +%Y-%m-%d-%H%M%S)
+        run: docker-compose build --tag docker-compose-image-name:$(date -u +%Y-%m-%d-%H%M%S)

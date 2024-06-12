@@ -8,6 +8,10 @@ on:
 
 permissions:
   contents: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
   
 jobs:
 
@@ -30,9 +34,32 @@ jobs:
         run: mvn --batch-mode --update-snapshots clean package -DskipTests=true
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag spring-boot-service:$(date -u +%Y-%m-%d-%H%M%S)
-
+        run: |
+          docker build . --file Dockerfile --tag spring-boot-service:$(date -u +%Y-%m-%d-%H%M%S)
+          echo "After Docker BUILD: image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+ 
+        
       #- name: Build the Docker Compose image
       #  run: docker-compose build --tag docker-compose-spring-boot-service:$(date -u +%Y-%m-%d-%H%M%S)
 
-      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Deploy staging with push to ECR
+        id: push
+        run: |
+          echo "Before ECR PUSH: image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main ${{ secrets.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}
+          docker push ${{ secrets.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}
+        
+
+

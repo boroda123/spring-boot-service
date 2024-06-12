@@ -13,7 +13,7 @@ env:
   REGISTRY: ghcr.io
   REPOSITORY: ${{ github.event.repository.name }}
   IMAGE_NAME: ${{ github.repository }}
-  ECR_SERVICE_ARN: spring-boot-service-dev
+  ECR_SERVICE_ARN: arn:aws:apprunner:us-east-2:654654561932:service/spring-boot-service-staging/350d6d50e8f8434690754082945539b7
   
 jobs:
 

@@ -13,6 +13,7 @@ env:
   REGISTRY: ghcr.io
   REPOSITORY: ${{ github.event.repository.name }}
   IMAGE_NAME: ${{ github.repository }}
+  ECR_SERVICE_ARN: spring-boot-service-dev
   
 jobs:
 
@@ -69,10 +70,48 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           #echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-          #echo "Before ECR PUSH: image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
-          #docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
-          #docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main ${{ secrets.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}
-          #docker push ${{ secrets.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}
-        
+
+      #################################
+      ### Start AWS deployment
+      #################################
+      - name: Deploy production with aws CLI
+        run: |
+          echo "Start deployment to AWS Runnre: ${{ env.ECR_SERVICE_ARN }} "
+          aws apprunner start-deployment --service-arn="${{ env.ECR_SERVICE_ARN }}"
+
+      - name: Wait for Deployment to Begin
+        run: |
+          STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
+
+          until [ "${STATUS}" == "OPERATION_IN_PROGRESS" ];
+          do
+            echo "$(date) ${STATUS}"
+            STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
+            sleep 10;
+          done
+
+      - name: Wait for Deployment to Complete
+        id: status
+        timeout-minutes: 10
+        run: |
+          STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
+
+          while [ "${STATUS}" == "OPERATION_IN_PROGRESS" ];
+          do
+            echo "$(date) ${STATUS}"
+            STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
+            sleep 30;
+          done
+          echo "deployment_status=${STATUS}"
+
+      - name: Check Deployment Status
+        id: check
+        run: |
+          if [ "${{ steps.status.outputs.deployment_status }}" == "RUNNING" ]; then
+            echo "Deployment successful"
+          else
+            echo "Deployment failed: ${{ steps.status.outputs.deployment_status }}"
+            exit 1
+          fi     
 
 

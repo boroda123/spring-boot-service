@@ -6,11 +6,16 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+  
 jobs:
 
   build:
 
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
 
     steps:
       - name: Checkout Repository
@@ -21,7 +26,7 @@ jobs:
           java-version: '17'
           distribution: 'oracle'
       
-      - name: Build with Maven
+      - name: Build with Maven first
         run: mvn --batch-mode --update-snapshots clean package -DskipTests=true
 
       - name: Build the Docker image

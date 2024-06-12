@@ -25,7 +25,9 @@ jobs:
         run: mvn --batch-mode --update-snapshots clean package -DskipTests=true
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag docker-image-name:$(date -u +%Y-%m-%d-%H%M%S)
+        run: docker build . --file Dockerfile --tag spring-boot-service:$(date -u +%Y-%m-%d-%H%M%S)
 
-      - name: Build the Docker Compose image
-        run: docker-compose build --tag docker-compose-image-name:$(date -u +%Y-%m-%d-%H%M%S)
+      #- name: Build the Docker Compose image
+      #  run: docker-compose build --tag docker-compose-spring-boot-service:$(date -u +%Y-%m-%d-%H%M%S)
+
+      

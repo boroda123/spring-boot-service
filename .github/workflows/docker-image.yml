@@ -11,7 +11,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  REPOSITOTY: ${{ github.event.repository.name }}
+  REPOSITORY: ${{ github.event.repository.name }}
   IMAGE_NAME: ${{ github.repository }}
   
 jobs:

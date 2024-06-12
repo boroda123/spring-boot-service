@@ -11,6 +11,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
+  REPOSITOTY: ${{ github.event.repository.name }}
   IMAGE_NAME: ${{ github.repository }}
   
 jobs:
@@ -36,8 +37,7 @@ jobs:
       - name: Build the Docker image
         run: |
           docker build . --file Dockerfile --tag spring-boot-service:$(date -u +%Y-%m-%d-%H%M%S)
-          echo "After Docker BUILD: image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          #echo "After Docker BUILD: image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+          echo "After Docker BUILD: image=$REGISTRY/$REPOSITORY:$IMAGE_NAME"
  
         
       #- name: Build the Docker Compose image
@@ -54,13 +54,24 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Deploy staging with push to ECR
-        id: push
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          echo "Before ECR PUSH: image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main ${{ secrets.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}
-          docker push ${{ secrets.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}
+          # Build a docker container and
+          #push it to ECR so that it can
+          # be deployed to ECS.
+          echo "BEFORE ECR push: image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          #echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+          #echo "Before ECR PUSH: image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+          #docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
+          #docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main ${{ secrets.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}
+          #docker push ${{ secrets.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}
         
 
 

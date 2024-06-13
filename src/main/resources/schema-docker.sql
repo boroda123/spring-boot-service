@@ -1,4 +1,4 @@
-create database if not exists demo;
+#create database if not exists demo;
 use demo;
 DROP TABLE IF EXISTS User;
 

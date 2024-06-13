@@ -1,3 +1,5 @@
+use demo;
+
 INSERT INTO User (firstName, lastName, login)
 VALUES ('Jan', 'First', 'jan.first.dock');
 INSERT INTO User (firstName, lastName, login)

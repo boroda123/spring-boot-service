@@ -109,7 +109,7 @@ jobs:
         id: check
         run: |
           if [ "${{ steps.status.outputs.deployment_status }}" == "RUNNING" ]; then
-            echo "Deployment successful"
+            echo "Deployment successful!"
           else
             echo "Deployment failed: ${{ steps.status.outputs.deployment_status }}"
             exit 1

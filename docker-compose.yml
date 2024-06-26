@@ -21,6 +21,8 @@ services:
   mysqldb:
     image: "mysql:8.0"
     restart: always
+    volumes:
+      - appvolume:/var/lib/mysql
     ports:
       - "6606:3306"
     networks:
@@ -32,3 +34,6 @@ services:
       MYSQL_ROOT_PASSWORD: Test1234!
 networks:
   springapimysql-net:
+
+volumes:
+  appvolume:

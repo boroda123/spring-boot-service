@@ -80,40 +80,40 @@ jobs:
       #    echo "Start deployment to AWS Runner: ${{ env.ECR_SERVICE_ARN }} "
       #    aws apprunner start-deployment --service-arn="${{ env.ECR_SERVICE_ARN }}"
 
-      - name: Wait for Deployment to Begin
-        run: |
-          echo "Waiting for deployment to AWS Runner: ${{ env.ECR_SERVICE_ARN }} "
-          STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
-
-          until [ "${STATUS}" == "OPERATION_IN_PROGRESS" ];
-          do
-            echo "$(date) ${STATUS}"
-            STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
-            sleep 10;
-          done
-
-      - name: Wait for Deployment to Complete
-        id: status
-        timeout-minutes: 10
-        run: |
-          STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
-
-          while [ "${STATUS}" == "OPERATION_IN_PROGRESS" ];
-          do
-            echo "$(date) ${STATUS}"
-            STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
-            sleep 30;
-          done
-          echo "deployment_status=${STATUS}"
-
-      - name: Check Deployment Status
-        id: check
-        run: |
-          if [ "${{ steps.status.outputs.deployment_status }}" == "RUNNING" ]; then
-            echo "Deployment successful!"
-          else
-            echo "Deployment failed: ${{ steps.status.outputs.deployment_status }}"
-            exit 1
-          fi     
+      #- name: Wait for Deployment to Begin
+      #  run: |
+      #    echo "Waiting for deployment to AWS Runner: ${{ env.ECR_SERVICE_ARN }} "
+      #    STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
+      #
+      #    until [ "${STATUS}" == "OPERATION_IN_PROGRESS" ];
+      #    do
+      #      echo "$(date) ${STATUS}"
+      #      STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
+      #      sleep 10;
+      #    done
+      #
+      #- name: Wait for Deployment to Complete
+      #  id: status
+      #  timeout-minutes: 10
+      #  run: |
+      #    STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
+      #
+      #    while [ "${STATUS}" == "OPERATION_IN_PROGRESS" ];
+      #    do
+      #      echo "$(date) ${STATUS}"
+      #      STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
+      #      sleep 30;
+      #    done
+      #    echo "deployment_status=${STATUS}"
+      #
+      #- name: Check Deployment Status
+      #  id: check
+      #  run: |
+      #    if [ "${{ steps.status.outputs.deployment_status }}" == "RUNNING" ]; then
+      #      echo "Deployment successful!"
+      #    else
+      #      echo "Deployment failed: ${{ steps.status.outputs.deployment_status }}"
+      #      exit 1
+      #    fi
 
 

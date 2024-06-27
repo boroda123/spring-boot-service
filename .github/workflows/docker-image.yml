@@ -81,8 +81,8 @@ jobs:
       #    aws apprunner start-deployment --service-arn="${{ env.ECR_SERVICE_ARN }}"
 
       - name: Wait for Deployment to Begin
-        echo "Waiting for deployment to AWS Runner: ${{ env.ECR_SERVICE_ARN }} "
         run: |
+          echo "Waiting for deployment to AWS Runner: ${{ env.ECR_SERVICE_ARN }} "
           STATUS=$(aws apprunner describe-service --query="Service.Status" --output=text --service-arn="${{ env.ECR_SERVICE_ARN }}")
 
           until [ "${STATUS}" == "OPERATION_IN_PROGRESS" ];

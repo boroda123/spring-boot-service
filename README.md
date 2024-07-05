@@ -10,6 +10,10 @@ The project can be run
 Currently, the service is deployed at AWS, try it here:
 https://k7b3riigaa.us-east-2.awsapprunner.com/users
 
+Snapshot of server response:
+
+![Snapshot of server response](./src/main/resources/images/server_response.png)
+
 Note: the spring-boot-service App Runner may be stopped on occasion to save operational costs.
 Please contact me directly for the demo.
 

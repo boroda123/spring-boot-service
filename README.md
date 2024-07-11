@@ -10,7 +10,7 @@ The project can be run
 Currently, the service is deployed at AWS, try it here:
 https://k7b3riigaa.us-east-2.awsapprunner.com/users
 
-**Note**: the spring-boot-service App Runner may be stopped on occasion to save operational costs.
+**Note**: the spring-boot-service AWS App Runner may be stopped on occasion to save operational costs.
 Please contact me directly for the local, Docker, or in-cloud demo.
 
 
